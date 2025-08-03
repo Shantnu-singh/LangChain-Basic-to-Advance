@@ -1,0 +1,42 @@
+# First approch that Langchain took
+class LLM:
+    def __init__(self):
+        print("LLM Invoked")
+        
+    def predict(self , prompt):
+        return {"responce":f"the ans of the prompt {prompt} is Really Easy to give"}
+    
+class PromptTemplate():
+    def __init__(self , template , input_varibale):
+        self.template = template
+        self.input_varibale = input_varibale
+        
+    def format(self , input_dict):
+         return self.template.format(**input_dict)
+  
+temp_template = PromptTemplate(
+    template= "Give me a {length} detailed blog about {topic}",
+    input_varibale= ['length' , 'topic' ]
+)   
+
+# Tradition FLow
+temp_llm = LLM()
+promt = temp_template.format({'topic' : "india" , 'length' : "100 words long"})
+temp_llm.predict(promt)
+
+# New Flow, Solving using LLMChain ( was not flexible )
+class LLMChain:
+    def __init__(self , llm , prompt):
+        self.llm = llm
+        self.prompt = prompt
+        
+    def run(self , input_dict):
+        template = self.prompt.format(input_dict)
+        result = self.llm.predict(template)
+        
+        return result['responce']
+    
+temp_llm_chain = LLMChain(llm = temp_llm , prompt= temp_template)
+
+temp_llm_chain.run({'topic' : "india" , 'length' : "100 words long"})
+        
