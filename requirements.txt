@@ -27,3 +27,6 @@ scikit-learn
 
 # Steamlit Utilities
 streamlit
+
+# LanhChain Coummunity
+langchain-community
