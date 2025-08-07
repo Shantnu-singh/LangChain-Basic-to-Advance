@@ -28,5 +28,8 @@ scikit-learn
 # Steamlit Utilities
 streamlit
 
-# LanhChain Coummunity
+# LangChain Coummunity
 langchain-community
+
+# LangChain Experimental
+langchain-experimental
