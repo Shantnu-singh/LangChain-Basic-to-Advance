@@ -21,9 +21,12 @@ if user_input:
     st.session_state['msg_hist'].append({'role' : 'user' , 'content' : user_input })
     with st.chat_message("user"):
         st.markdown(user_input)
-    
-    responce = chatbot.invoke({"messages" : [HumanMessage(content=user_input)]} , config= CONFIG)
-    # Save assistance msg in hist
-    st.session_state['msg_hist'].append({'role' : 'assistant' , 'content' : responce['messages'][-1].content})
-    with st.chat_message("assistant"):
-        st.markdown(responce['messages'][-1].content)
+
+        # Save assistance msg in hist
+        with st.chat_message("assistant"):
+            ai_msg = st.write_stream(msg_chunk.content for msg_chunk,metadata in 
+                            chatbot.stream({"messages" : [HumanMessage(content=user_input)]} , 
+                                            config= CONFIG , 
+                                            stream_mode='messages')
+                            )
+            st.session_state['msg_hist'].append({'role' : 'assistant' , 'content' : ai_msg})
