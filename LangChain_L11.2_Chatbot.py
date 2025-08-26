@@ -1,18 +1,53 @@
 import streamlit as st
 from LangChain_L11_Chatbot import chatbot , HumanMessage
-CONFIG = {'configurable': {'thread_id': 'thread-1'}}
+import uuid
 # st.set_page_config(layout="wide")
+
+def generate_thread_id():
+    thread_id = uuid.uuid4()
+    return thread_id
+
+def add_thread(thread_id):
+    if thread_id not in st.session_state['chat_threads']:
+        st.session_state['chat_threads'].append(thread_id)
+    
+def reset_chat():
+    thread_id = generate_thread_id()
+    st.session_state['thread_id'] = thread_id
+    add_thread(st.session_state['thread_id'])
+    st.session_state['msg_hist'] = []
+    
 
 # Create a session state
 message_history = []
 
 if 'msg_hist' not in st.session_state:
     st.session_state['msg_hist'] = []
+    
+if 'thread_id' not in st.session_state:
+    st.session_state['thread_id'] = generate_thread_id()
+    
+if "chat_threads" not in st.session_state:
+    st.session_state['chat_threads'] = []
+    
+add_thread(st.session_state['thread_id'])
 
 for msg in st.session_state['msg_hist']:
     with st.chat_message(msg['role']):
         st.markdown(msg['content'])
+        
+# SideBar UI
+st.sidebar.title("SpiceJet Chatbot")
 
+if st.sidebar.button("New Chat"):
+    reset_chat()
+    st.rerun()
+
+
+st.sidebar.title("My Conversation")
+
+for thread_id in st.session_state['chat_threads']:
+    st.sidebar.button(str(thread_id))
     
 user_input = st.chat_input("Type here...")
 
@@ -21,6 +56,8 @@ if user_input:
     st.session_state['msg_hist'].append({'role' : 'user' , 'content' : user_input })
     with st.chat_message("user"):
         st.markdown(user_input)
+
+        CONFIG = {'configurable': {'thread_id': st.session_state['thread_id']}}
 
         # Save assistance msg in hist
         with st.chat_message("assistant"):
