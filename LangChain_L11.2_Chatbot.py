@@ -1,6 +1,8 @@
 import streamlit as st
 from LangChain_L11_Chatbot import chatbot , HumanMessage
 import uuid
+from langchain_google_genai import ChatGoogleGenerativeAI
+
 # st.set_page_config(layout="wide")
 
 def generate_thread_id():
@@ -16,6 +18,11 @@ def reset_chat():
     st.session_state['thread_id'] = thread_id
     add_thread(st.session_state['thread_id'])
     st.session_state['msg_hist'] = []
+    
+def load_conversation(thread_id):
+    CONFIG = {'configurable': {'thread_id': thread_id}}
+
+    return chatbot.get_state(config= CONFIG).values['messages']
     
 
 # Create a session state
@@ -46,8 +53,22 @@ if st.sidebar.button("New Chat"):
 
 st.sidebar.title("My Conversation")
 
-for thread_id in st.session_state['chat_threads']:
-    st.sidebar.button(str(thread_id))
+for thread_id in st.session_state['chat_threads'][::-1]:
+    if st.sidebar.button(str(thread_id)):
+        st.session_state['thread_id'] = thread_id
+        messages = load_conversation(thread_id)
+        
+        temp_msg = []
+        
+        for msg in messages:
+            if isinstance(msg , HumanMessage):
+                role = 'user'
+            else:
+                role = 'assistant'
+            temp_msg.append({'role':role , 'content' : msg.content})
+        
+        st.session_state['msg_hist'] = temp_msg
+            
     
 user_input = st.chat_input("Type here...")
 
