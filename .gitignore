@@ -4,3 +4,4 @@ chroma_db/
 test.py
 __pycache__/
 .streamlit/
+test1.py
